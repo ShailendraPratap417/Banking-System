@@ -1,0 +1,7 @@
+node_portable/
+maven_portable/
+
+backend/target/
+frontend/node_modules/
+
+*.log
