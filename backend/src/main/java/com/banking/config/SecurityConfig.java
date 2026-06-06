@@ -53,19 +53,33 @@ public class SecurityConfig {
     // ✅ SECURITY FILTER CHAIN
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         http
             .csrf(AbstractHttpConfigurer::disable)
+
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/h2-console/**").permitAll()
+                // ✅ PUBLIC ENDPOINTS (NO LOGIN REQUIRED)
+                .requestMatchers(
+                        "/",
+                        "/error",
+                        "/api/auth/**",
+                        "/h2-console/**"
+                ).permitAll()
+
+                // 🔐 EVERYTHING ELSE NEEDS JWT
                 .anyRequest().authenticated()
             )
+
             .headers(headers -> headers.frameOptions(frame -> frame.disable()))
+
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
+
             .authenticationProvider(authenticationProvider())
+
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -80,22 +94,23 @@ public class SecurityConfig {
         return provider;
     }
 
-    // ✅ AUTH MANAGER (ONLY ONE)
+    // ✅ AUTH MANAGER
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
-    // ✅ PASSWORD ENCODER (ONLY HERE, NOT IN ANOTHER FILE)
+    // ✅ PASSWORD ENCODER
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // ✅ CORS CONFIG
+    // ✅ CORS CONFIG (frontend support)
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(
