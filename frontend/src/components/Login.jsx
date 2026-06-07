@@ -8,31 +8,38 @@ function Login({ onLogin, onSwitch, showToast }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+
     if (!username || !password) {
       showToast('Please fill in all fields', 'error')
       return
     }
 
     setLoading(true)
+
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ username, password })
-      })
+      const response = await fetch(
+        "https://banking-system-production-c33a.up.railway.app/api/auth/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ username, password })
+        }
+      )
+
       const data = await response.json()
       setLoading(false)
-      
+
       if (response.ok) {
         onLogin(data, data.token)
       } else {
-        showToast(data.error || 'Authentication failed', 'error')
+        showToast(data.error || "Authentication failed", "error")
       }
+
     } catch (err) {
       setLoading(false)
-      showToast('Cannot connect to banking server. Ensure backend is running.', 'error')
+      showToast("Cannot connect to banking server. Ensure backend is running.", "error")
     }
   }
 
@@ -50,9 +57,9 @@ function Login({ onLogin, onSwitch, showToast }) {
         <div className="form-group">
           <label className="form-label">Username</label>
           <div className="form-input-container">
-            <input 
-              type="text" 
-              className="form-input" 
+            <input
+              type="text"
+              className="form-input"
               placeholder="e.g. janesmith"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
@@ -65,9 +72,9 @@ function Login({ onLogin, onSwitch, showToast }) {
         <div className="form-group">
           <label className="form-label">Password</label>
           <div className="form-input-container">
-            <input 
-              type="password" 
-              className="form-input" 
+            <input
+              type="password"
+              className="form-input"
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -83,7 +90,7 @@ function Login({ onLogin, onSwitch, showToast }) {
       </form>
 
       <div className="auth-footer">
-        Don't have an account? 
+        Don't have an account?
         <span className="auth-link" onClick={onSwitch}>Create One</span>
       </div>
     </div>
