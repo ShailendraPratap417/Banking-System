@@ -25,27 +25,32 @@ function TransferModal({ action, accounts, onClose, onSuccess, showToast }) {
       setRecipientName('')
     }
   }, [destAccount, action])
+const validateRecipient = async (accNum) => {
+  setValidatingRecipient(true)
 
-  const validateRecipient = async (accNum) => {
-    setValidatingRecipient(true)
-    try {
-      const response = await fetch(`/api/accounts/${accNum}`, {
+  try {
+    const response = await fetch(
+      `https://banking-system-production-c33a.up.railway.app/api/accounts/${accNum}`,
+      {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          Authorization: `Bearer ${localStorage.getItem('token')}`
         }
-      })
-      const data = await response.json()
-      setValidatingRecipient(false)
-      if (response.ok && data.fullName) {
-        setRecipientName(data.fullName)
-      } else {
-        setRecipientName('')
       }
-    } catch (err) {
-      setValidatingRecipient(false)
+    )
+
+    const data = await response.json()
+    setValidatingRecipient(false)
+
+    if (response.ok && data.fullName) {
+      setRecipientName(data.fullName)
+    } else {
       setRecipientName('')
     }
+  } catch (err) {
+    setValidatingRecipient(false)
+    setRecipientName('')
   }
+}
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -56,35 +61,44 @@ function TransferModal({ action, accounts, onClose, onSuccess, showToast }) {
 
     setLoading(true)
 
-    let url = ''
-    let bodyObj = { accountNumber: selectedAccount, amount: parseFloat(amount), description }
+    const BASE_URL =
+  'https://banking-system-production-c33a.up.railway.app/api'
 
-    if (action === 'deposit') {
-      url = '/api/transactions/deposit'
-    } else if (action === 'withdraw') {
-      url = '/api/transactions/withdraw'
-    } else if (action === 'transfer') {
-      url = '/api/transactions/transfer'
-      bodyObj = {
-        sourceAccountNumber: selectedAccount,
-        destinationAccountNumber: destAccount,
-        amount: parseFloat(amount),
-        description
-      }
-      if (!recipientName) {
-        setLoading(false)
-        showToast('Please enter a valid destination account', 'error')
-        return
-      }
-    } else if (action === 'bill') {
-      url = '/api/transactions/pay-bill'
-      bodyObj = {
-        sourceAccountNumber: selectedAccount,
-        billerName,
-        amount: parseFloat(amount)
-      }
-    }
+let url = ''
+let bodyObj = {
+  accountNumber: selectedAccount,
+  amount: parseFloat(amount),
+  description
+}
 
+if (action === 'deposit') {
+  url = `${BASE_URL}/transactions/deposit`
+} else if (action === 'withdraw') {
+  url = `${BASE_URL}/transactions/withdraw`
+} else if (action === 'transfer') {
+  url = `${BASE_URL}/transactions/transfer`
+
+  bodyObj = {
+    sourceAccountNumber: selectedAccount,
+    destinationAccountNumber: destAccount,
+    amount: parseFloat(amount),
+    description
+  }
+
+  if (!recipientName) {
+    setLoading(false)
+    showToast('Please enter a valid destination account', 'error')
+    return
+  }
+} else if (action === 'bill') {
+  url = `${BASE_URL}/transactions/pay-bill`
+
+  bodyObj = {
+    sourceAccountNumber: selectedAccount,
+    billerName,
+    amount: parseFloat(amount)
+  }
+}
     try {
       const response = await fetch(url, {
         method: 'POST',

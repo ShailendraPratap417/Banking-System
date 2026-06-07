@@ -25,11 +25,25 @@ function Dashboard({ user, accounts, fetchAccounts, showToast }) {
 
   const fetchRecentTransactions = async (accNum) => {
     try {
-      const response = await fetch(`/api/transactions/history/${accNum}`, {
+      const fetchRecentTransactions = async (accNum) => {
+  try {
+    const response = await fetch(
+      `https://banking-system-production-c33a.up.railway.app/api/transactions/history/${accNum}`,
+      {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          Authorization: `Bearer ${localStorage.getItem('token')}`
         }
-      })
+      }
+    )
+
+    if (response.ok) {
+      const data = await response.json()
+      setRecentTransactions(data.slice(0, 5))
+    }
+  } catch (err) {
+    console.error('Failed to load transaction history', err)
+  }
+}
       if (response.ok) {
         const data = await response.json()
         setRecentTransactions(data.slice(0, 5))
