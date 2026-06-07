@@ -23,7 +23,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
-import java.util.Collections;
 
 @Configuration
 @EnableWebSecurity
@@ -38,7 +37,7 @@ public class SecurityConfig {
         this.userRepository = userRepository;
     }
 
-    // ✅ USER DETAILS SERVICE
+    // USER DETAILS SERVICE
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> userRepository.findByUsername(username)
@@ -50,7 +49,7 @@ public class SecurityConfig {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
     }
 
-    // ✅ SECURITY FILTER CHAIN
+    // SECURITY FILTER CHAIN
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
@@ -60,7 +59,6 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
             .authorizeHttpRequests(auth -> auth
-                // ✅ PUBLIC ENDPOINTS (NO LOGIN REQUIRED)
                 .requestMatchers(
                         "/",
                         "/error",
@@ -68,7 +66,6 @@ public class SecurityConfig {
                         "/h2-console/**"
                 ).permitAll()
 
-                // 🔐 EVERYTHING ELSE NEEDS JWT
                 .anyRequest().authenticated()
             )
 
@@ -85,7 +82,7 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // ✅ AUTH PROVIDER
+    // AUTH PROVIDER
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -94,27 +91,30 @@ public class SecurityConfig {
         return provider;
     }
 
-    // ✅ AUTH MANAGER
+    // AUTH MANAGER
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
-    // ✅ PASSWORD ENCODER
+    // PASSWORD ENCODER
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // ✅ CORS CONFIG (frontend support)
+    // ✅ FIXED CORS FOR LOCAL + VERCEL
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(
-                Collections.singletonList("http://localhost:5173")
+                Arrays.asList(
+                        "http://localhost:5173",
+                        "https://banking-system-kappa-rose.vercel.app"
+                )
         );
 
         configuration.setAllowedMethods(
