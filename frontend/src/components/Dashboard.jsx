@@ -24,8 +24,6 @@ function Dashboard({ user, accounts, fetchAccounts, showToast }) {
   }, [accounts])
 
   const fetchRecentTransactions = async (accNum) => {
-    try {
-      const fetchRecentTransactions = async (accNum) => {
   try {
     const response = await fetch(
       `https://banking-system-production-c33a.up.railway.app/api/transactions/history/${accNum}`,
@@ -39,29 +37,27 @@ function Dashboard({ user, accounts, fetchAccounts, showToast }) {
     if (response.ok) {
       const data = await response.json()
       setRecentTransactions(data.slice(0, 5))
+    } else {
+      console.log('History API error:', response.status)
     }
   } catch (err) {
     console.error('Failed to load transaction history', err)
   }
 }
-      if (response.ok) {
-        const data = await response.json()
-        setRecentTransactions(data.slice(0, 5))
-      }
-    } catch (err) {
-      console.error('Failed to load transaction history', err)
-    }
-  }
-
   const openActionModal = (action) => {
     setModalAction(action)
     setModalOpen(true)
   }
 
-  const handleTransactionComplete = () => {
-    fetchAccounts()
-    setModalOpen(false)
+  const handleTransactionComplete = async () => {
+  await fetchAccounts()
+
+  if (checkingAccount) {
+    await fetchRecentTransactions(checkingAccount.accountNumber)
   }
+
+  setModalOpen(false)
+}
 
   const chartData = [
     { label: 'Mon', amount: 45, value: '$120' },
