@@ -22,11 +22,15 @@ function TransactionHistory({ accounts, showToast }) {
   const fetchHistory = async (accNum) => {
     setLoading(true)
     try {
-      const response = await fetch(`/api/transactions/history/${accNum}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      })
+      const response = await fetch(
+  `https://banking-system-production-c33a.up.railway.app/api/transactions/history/${accNum}`,
+  {
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
+    }
+  }
+)
+console.log("History Response:", response.status)
       const data = await response.json()
       setLoading(false)
       if (response.ok) {
