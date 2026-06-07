@@ -7,7 +7,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'http://localhost:8080',
+        target: 'target: 'https://banking-system-production-c33a.up.railway.app'',
         changeOrigin: true
       }
     }
