@@ -2,14 +2,5 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 export default defineConfig({
-  plugins: [react()],
-  server: {
-    port: 5173,
-    proxy: {
-      '/api': {
-        target: 'target: 'https://banking-system-production-c33a.up.railway.app'',
-        changeOrigin: true
-      }
-    }
-  }
+  plugins: [react()]
 })
