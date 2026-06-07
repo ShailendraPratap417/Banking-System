@@ -10,21 +10,33 @@ function Register({ onSwitch, showToast }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+
     if (!fullName || !email || !username || !password) {
       showToast('Please fill in all fields', 'error')
       return
     }
 
     setLoading(true)
+
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ fullName, email, username, password })
-      })
+      const response = await fetch(
+        'https://banking-system-production-c33a.up.railway.app/api/auth/register',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            fullName,
+            email,
+            username,
+            password
+          })
+        }
+      )
+
       const data = await response.json()
+
       setLoading(false)
 
       if (response.ok) {
@@ -46,16 +58,18 @@ function Register({ onSwitch, showToast }) {
           <Landmark size={32} style={{ color: 'var(--accent-primary)' }} />
           <span>AuraBank</span>
         </div>
-        <p className="auth-subtitle">Join us to experience next-gen premium banking</p>
+        <p className="auth-subtitle">
+          Join us to experience next-gen premium banking
+        </p>
       </div>
 
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label className="form-label">Full Name</label>
           <div className="form-input-container">
-            <input 
-              type="text" 
-              className="form-input" 
+            <input
+              type="text"
+              className="form-input"
               placeholder="e.g. Jane Smith"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
@@ -68,9 +82,9 @@ function Register({ onSwitch, showToast }) {
         <div className="form-group">
           <label className="form-label">Email Address</label>
           <div className="form-input-container">
-            <input 
-              type="email" 
-              className="form-input" 
+            <input
+              type="email"
+              className="form-input"
               placeholder="e.g. jane@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -83,9 +97,9 @@ function Register({ onSwitch, showToast }) {
         <div className="form-group">
           <label className="form-label">Username</label>
           <div className="form-input-container">
-            <input 
-              type="text" 
-              className="form-input" 
+            <input
+              type="text"
+              className="form-input"
               placeholder="e.g. janesmith"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
@@ -98,9 +112,9 @@ function Register({ onSwitch, showToast }) {
         <div className="form-group">
           <label className="form-label">Password</label>
           <div className="form-input-container">
-            <input 
-              type="password" 
-              className="form-input" 
+            <input
+              type="password"
+              className="form-input"
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -116,8 +130,10 @@ function Register({ onSwitch, showToast }) {
       </form>
 
       <div className="auth-footer">
-        Already have an account? 
-        <span className="auth-link" onClick={onSwitch}>Login</span>
+        Already have an account?
+        <span className="auth-link" onClick={onSwitch}>
+          Login
+        </span>
       </div>
     </div>
   )
